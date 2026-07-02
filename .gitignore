@@ -1,0 +1,20 @@
+﻿# CMake / Visual Studio build artifacts
+/build/
+/Debug/
+/Release/
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/Makefile
+/*.sln
+/*.vcxproj*
+/*.user
+/*.suo
+/*.log
+/*.obj
+/*.lib
+/*.exe
+/*.pdb
+/*.idb
+/*.ilk
+/*.dll

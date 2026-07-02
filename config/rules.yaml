@@ -1,0 +1,59 @@
+# ============================================================
+# Rate Limiting Rules — ByteByteGo Ch-5 Format
+# Workers pull these from disk and cache in Redis (in production)
+# ============================================================
+
+# Rule 1: Login endpoint — prevent brute force
+domain: auth
+descriptors:
+  - key: endpoint
+    value: /api/login
+    algorithm: sliding_window_log
+    rate_limit:
+      unit: minute
+      requests_per_unit: 5
+      window_secs: 60
+
+# Rule 2: Marketing messages per user per day
+domain: messaging
+descriptors:
+  - key: message_type
+    value: marketing
+    algorithm: fixed_window_counter
+    rate_limit:
+      unit: day
+      requests_per_unit: 5
+      window_secs: 86400
+
+# Rule 3: API reads — token bucket (allows burst)
+domain: api
+descriptors:
+  - key: endpoint
+    value: /api/data
+    algorithm: token_bucket
+    rate_limit:
+      unit: second
+      requests_per_unit: 100
+      burst_capacity: 200     # tokens in bucket
+
+# Rule 4: Payment endpoint — leaky bucket (stable output)
+domain: payments
+descriptors:
+  - key: endpoint
+    value: /api/pay
+    algorithm: leaky_bucket
+    rate_limit:
+      unit: second
+      outflow_rate: 10
+      bucket_capacity: 20
+
+# Rule 5: Global fallback — sliding window counter
+domain: global
+descriptors:
+  - key: type
+    value: default
+    algorithm: sliding_window_counter
+    rate_limit:
+      unit: second
+      requests_per_unit: 1000
+      window_secs: 1
